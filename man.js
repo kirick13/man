@@ -429,8 +429,7 @@
 		}
 
 		// Element size & position
-		// width, innerWidth, outerWidth, height, innerHeight, outerHeight
-		// TODO offset, position
+		// width, innerWidth, outerWidth, height, innerHeight, outerHeight, offset, position
 		{
 			const getWidthWithPadding = (el) => el ? el.clientWidth : void 0;
 			plist.width = function(){

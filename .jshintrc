@@ -1,0 +1,12 @@
+{
+	"indent": 1,
+
+	"esversion": 9,
+	"strict": "global",
+	"browser": true,
+	"unused": true,
+	"varstmt": true,
+	"eqeqeq": true,
+	"noyield": true,
+	"curly": true
+}
