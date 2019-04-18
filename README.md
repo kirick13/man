@@ -7,7 +7,7 @@ I want to eliminate jQuery from my projects, but I still need to perform simple 
 # How it works?
 $man is doing some (probably) bad things: we are extending `NodeList` and `Element` prototypes with jQuery-like functions. 
 
-Unlike jQuery, the main function (`$man('article')`) is just an alias to `document.querySelectorAll` and returning `NodeList` instance, so we making queries as fast as we can. Oh yes, almost all of $man functions are lightweight wrappers over the native DOM functions.
+Unlike jQuery, the main function (`$man('article')`) is just an alias to `document.querySelectorAll` and returning `NodeList` instance, so we are making queries as fast as we can. Oh yes, almost all of $man functions are lightweight wrappers over the native DOM functions.
 
 Almost all of $man functions are sharing the same names and logic with jQuery functions, e.g. `jQuery('article').find('div.element')` will be written as `$man('article').$find('div.element')` with $man.
 
