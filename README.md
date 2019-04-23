@@ -13,6 +13,8 @@ Almost all of $man functions are sharing the same names and logic with jQuery fu
 
 **Important**: $man was created to make only DOM traversal and event binding, so it does not contain AJAX (use `fetch` or `axios`), animations (use CSS trantisions instead) or functions like `$.extend`, `$.type` and `$.proxy`.
 
+You can read $man's documentation [here](https://github.com/kirick13/man/wiki/manpage-of-$man).
+
 # Can I just replace jQuery with $man?
 The answer is **no**. $man is not fully compatible with jQuery and does not follow jQuery specifications strictly. You **can't** make find-and-replace operations in your jQuery code to migrate to $man. For example, some functions like `filter` and `nextUntil` do not accept function as an argument; $man does not support Sizzle selectors like `:visible`; functions like `each` will be never included to $man because you can iterate collections with `for..of` or `Array.prototype.forEach`.
 
