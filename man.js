@@ -5,7 +5,7 @@
 	const d = document;
 	const arg_qselall = 'querySelectorAll';
 	const qselall = d[arg_qselall].bind(d);
-	const [ el_html ] = qselall('html');
+	// const [ el_html ] = qselall('html');
 
 	const class_node = Node;
 	const class_element = Element;
@@ -15,7 +15,9 @@
 		Object.defineProperty(key, name, { value });
 	};
 
-	const parseInt = w.parseInt;
+	// const parseInt = w.parseInt;
+	const parseFloat = w.parseFloat;
+	const getComputedStyle = w.getComputedStyle;
 
 	// Creating NodeList is a big deal
 	// https://stackoverflow.com/questions/13351966/create-node-list-from-a-single-node-in-javascript
@@ -139,7 +141,7 @@
 			return key.replace(/-([a-z])/, (_, letter) => letter.toUpperCase());
 		};
 
-		// Matched elements matching / change
+		// Current collections mutation
 		// is, add, filter, not
 		// TODO has
 		{
@@ -169,16 +171,19 @@
 		}
 
 		// DOM traversal
-		// find, childs, parent, parents, parentsUntil, next, nextAll, prev, prevAll, siblings, contains
+		// find, childs
+		// parent, parents, parentsUntil
+		// next, nextAll, prev, prevAll
+		// siblings, index, contains
 		// TODO nextUntil, prevUntil, contents
 		{
 			pel.find = function(selector){
 				return this[arg_qselall](selector);
 			};
 			plist.find = function(selector){
-				const nodes = [];
+				const nodes = new Set();
 				for(const el of this){
-					nodes.push(...el[arg_qselall](selector));
+					addToSet(nodes, ...el[arg_qselall](selector));
 				}
 				return createNodeList(nodes);
 			};
@@ -316,7 +321,9 @@
 		}
 
 		// DOM operations
-		// append, appendTo, prepend, prependTo, insertBefore, before, insertAfter, after, remove, detach, clone, replaceWith
+		// append, appendTo, prepend, prependTo,
+		// insertBefore, before, insertAfter, after,
+		// remove, detach, clone, replaceWith
 		{
 			{
 				const ops = [
@@ -343,13 +350,12 @@
 				const addTo = (op_type, targets, elements, order = 0) => {
 					const fn = ops[op_type];
 
-					elements = argsToNodes(elements, +!order);
 					const targets_copy = createNodeList(targets);
 
 					const args = [];
 					for(const el of targets_copy){
 						args[order] = el;
-						for(const node of elements){
+						for(const node of argsToNodes(elements, +!order)){
 							args[+!order] = node;
 							fn(...args);
 						}
@@ -396,14 +402,6 @@
 				};
 			}
 
-			// pel.remove = function(){
-			// 	this.parentNode.removeChild(this);
-			// };
-			// plist.remove = function(){
-			// 	for(const el of this){
-			// 		el.parentNode.removeChild(el);
-			// 	}
-			// };
 			const detach = (node) => node.parentNode.removeChild(node);
 			pel.detach = pel.remove = function(){
 				return detach(this);
@@ -416,13 +414,14 @@
 				return createNodeList(nodes);
 			};
 
+			const clone = (node) => node.cloneNode(true);
 			pel.clone = function(){
-				return this.cloneNode(true);
+				return clone(this);
 			};
 			plist.clone = function(){
 				const nodes = [];
 				for(const el of this){
-					nodes.push(el.cloneNode(true));
+					nodes.push(clone(el));
 				}
 				return createNodeList(nodes);
 			};
@@ -433,66 +432,67 @@
 		{
 			const getWidthWithPadding = (el) => el ? el.clientWidth : void 0;
 			plist.width = function(){
-				const el = this[0];
+				const [ el ] = this;
 				if(!el){
 					return;
 				}
 				const styles = getComputedStyle(el);
-				return getWidthWithPadding(el) - parseInt(styles.paddingLeft) - parseInt(styles.paddingRight);
+				return getWidthWithPadding(el) - parseFloat(styles.paddingLeft) - parseFloat(styles.paddingRight);
 			};
 			plist.innerWidth = function(){
 				return getWidthWithPadding(this[0]);
 			};
 			plist.outerWidth = function(with_margin){
-				const el = this[0];
+				const [ el ] = this;
 				if(!el){
 					return;
 				}
 				let result = el.offsetWidth;
 				if(true === with_margin){
 					const styles = getComputedStyle(el);
-					result += parseInt(styles.marginLeft) + parseInt(styles.marginRight);
+					result += parseFloat(styles.marginLeft) + parseFloat(styles.marginRight);
 				}
 				return result;
 			};
 
 			const getHeightWithPadding = (el) => el ? el.clientHeight : void 0;
 			plist.height = function(){
-				const el = this[0];
+				const [ el ] = this;
 				if(!el){
 					return;
 				}
 				const styles = getComputedStyle(el);
-				return getHeightWithPadding(el) - parseInt(styles.paddingTop) - parseInt(styles.paddingBottom);
+				return getHeightWithPadding(el) - parseFloat(styles.paddingTop) - parseFloat(styles.paddingBottom);
 			};
 			plist.innerHeight = function(){
 				return getHeightWithPadding(this[0]);
 			};
 			plist.outerHeight = function(with_margin){
-				const el = this[0];
+				const [ el ] = this;
 				if(!el){
 					return;
 				}
 				let result = el.offsetHeight;
 				if(true === with_margin){
 					const styles = getComputedStyle(el);
-					result += parseInt(styles.marginTop) + parseInt(styles.marginBottom);
+					result += parseFloat(styles.marginTop) + parseFloat(styles.marginBottom);
 				}
 				return result;
 			};
 
 			plist.offset = function(){
-				if(!this[0]){
+				const [ el ] = this;
+				if(!el){
 					return;
 				}
-				const rect = this[0].getBoundingClientRect();
+				const rect = el.getBoundingClientRect();
 				return {
 					top: rect.top + d.body.scrollTop,
 					left: rect.left + d.body.scrollLeft
 				};
 			};
 			plist.position = function(){
-				const el = this[0];
+				const [ el ] = this;
 				if(!el){
 					return;
 				}
@@ -503,7 +503,7 @@
 			};
 		}
 
-		// Element content:
+		// Element content
 		// html, text, empty
 		{
 			plist.html = function(...args){
@@ -604,8 +604,8 @@
 			};
 		}
 
-		// Attributes:
-		// attr, attrRemove, prop, data, value
+		// Attributes
+		// attr, attrAll, attrRemove, prop, data, value
 		{
 			const getAttr = (el, name) => el.hasAttribute(name) ? el.getAttribute(name) : null;
 			plist.attr = function(...args){
@@ -643,9 +643,11 @@
 				}
 				return attrs;
 			};
-			plist.attrRemove = plist.removeAttr = function(name){
+			plist.attrRemove = plist.removeAttr = function(...names){
 				for(const el of this){
-					el.removeAttribute(name);
+					for(const name of names){
+						el.removeAttribute(name);
+					}
 				}
 				return this;
 			};
@@ -684,7 +686,7 @@
 
 					let datas = {};
 					if(args[0] instanceof Object){
-						datas = args[0];
+						[ datas ] = args;
 					}
 					else if(typeof args[0] === 'string'){
 						const [ key, value ] = args;
@@ -813,7 +815,12 @@
 					return false;
 				}
 			})();
-			const native_events = new Set(Object.keys(HTMLElement.prototype).filter(a => 'on' === a.substr(0, 2)).map(a => a.substr(2)));
+			const native_events = new Set(
+				Object.keys(HTMLElement.prototype)
+				.concat(Object.keys(Element.prototype))
+				.map(a => 'on' === a.substr(0, 2) ? a.substr(2) : 0)
+			);
+			native_events.delete(0);
 			const createEvent = (name, detail = {}, options = {}) => {
 				const is_native = native_events.has(name.toLowerCase());
 				// console.log('is_native', is_native);
@@ -909,7 +916,7 @@
 		}
 
 		def(class_element.prototype, name, fn_single);
-		def($man, name, fn_single.bind(el_html));
+		def($man, name, fn_single.bind(d));
 		def(class_list.prototype, name, fn);
 		if(fn_window){
 			def(w, name, fn_single.bind(w));
@@ -941,16 +948,38 @@
 				return el_given.$parents(selector)[0];
 			}
 		};
+		const isSelfOrParentEqual = (el_given, els_set) => {
+			if(!el_given || !el_given.$is){
+				return;
+			}
+			else {
+				for(let el = el_given; el; el = el.parentNode){
+					if(els_set.has(el)){
+						return el;
+					}
+				}
+			}
+		};
 		const createFn = (els, name, ...args) => {
 			const { selector, callback_given, options } = parseOnArgs('', ...args);
 
-			const callback = (ev) => {
+			const els_set = null === selector ? new Set(els) : null;
+
+			const callback = null === selector ? function(ev){
+				// console.log(ev.target, ev.relatedTarget);
+				const el_target = isSelfOrParentEqual(ev.target, els_set);
+				const el_related = isSelfOrParentEqual(ev.relatedTarget, els_set);
+				// console.log(el_target, el_related);
+				if(el_target && el_target !== el_related){
+					callback_given.call(this, ev);
+				}
+			} : function(ev){
 				// console.log(ev.target, ev.relatedTarget);
 				const el_target = isSelfOrParentMatch(ev.target, selector);
 				const el_related = isSelfOrParentMatch(ev.relatedTarget, selector);
 				// console.log(el_target, el_related);
 				if(el_target && el_target !== el_related){
-					callback_given(ev);
+					callback_given.call(this, ev);
 				}
 			};
 
