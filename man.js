@@ -1,23 +1,26 @@
 'use strict';
 
 (() => {
+	// global
 	const w = window;
-	const d = document;
-	const arg_qselall = 'querySelectorAll';
-	const qselall = d[arg_qselall].bind(d);
-	// const [ el_html ] = qselall('html');
+	// const parseInt = w.parseInt;
+	const parseFloat = w.parseFloat;
+	const getComputedStyle = w.getComputedStyle;
 
+	// dom
+	const d = document;
 	const class_node = Node;
 	const class_element = Element;
 	const class_list = NodeList;
 
+	// methods
+	const arg_qselall = 'querySelectorAll';
+
+	const qselall = d[arg_qselall].bind(d);
+
 	const def = (key, name, value) => {
 		Object.defineProperty(key, name, { value });
 	};
-
-	// const parseInt = w.parseInt;
-	const parseFloat = w.parseFloat;
-	const getComputedStyle = w.getComputedStyle;
 
 	// Creating NodeList is a big deal
 	// https://stackoverflow.com/questions/13351966/create-node-list-from-a-single-node-in-javascript
@@ -49,8 +52,6 @@
 		return Object.create(node_list, params);
 	};
 	const parseHTML = (html) => {
-		// const tmp = d.implementation.createHTMLDocument();
-		// tmp.body.innerHTML = html;
 		const tmp = d.createElement('div');
 		tmp.innerHTML = html;
 
