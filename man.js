@@ -638,7 +638,7 @@
 				const attrs = {};
 				for(const name of el.getAttributeNames()){
 					const value = getAttr(el, name);
-					if(value){
+					if(null !== value){
 						attrs[name] = value;
 					}
 				}
@@ -735,7 +735,7 @@
 		}
 
 		// Events
-		// on, one, off, trigger
+		// on, one, off, trigger, onWithOff
 		{
 			const callbacks_storage = new Map();
 			const op_bind = (op, els, args) => {
@@ -780,9 +780,9 @@
 							op_bind('off', els, args);
 						}
 					};
-				}
 
-				callbacks_storage.set(callback_given, callback);
+					callbacks_storage.set(callback_given, callback);
+				}
 
 				const listener_pref = ('off' === op ? 'remove' : 'add');
 				op_do(els, listener_pref, events, callback, options);
@@ -855,6 +855,7 @@
 				for(const el of this){
 					el.dispatchEvent(ev);
 				}
+				return this;
 			};
 		}
 
