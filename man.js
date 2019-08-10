@@ -735,19 +735,32 @@
 		}
 
 		// Events
-		// on, one, off, trigger, onWithOff
+		// on, once, off, trigger
 		{
-			const callbacks_storage = new Map();
+			const TYPE_ON = 1;
+			const TYPE_ONCE = 2;
+			const TYPE_ONCE_EXACTLY = 3;
+			const TYPE_OFF = 0;
+
+			const KEY_CALLBACK_ORIGINAL = '_$man_callback_original';
+
+			// const callbacks_storage = new Map();
 			const op_bind = (op, els, args) => {
 				// const { events, /* selector, callback_given, */ callback, options } = prepare(...args);
 				const { events, selector, callback_given, options = {} } = parseOnArgs(...args);
 
 				let callback = null;
-				if('off' === op){
-					callback = callbacks_storage.get(callback_given);
-					callbacks_storage.delete(callback_given);
+				if(TYPE_OFF === op){
+					callback = callback_given[KEY_CALLBACK_ORIGINAL];
+					// callback = callbacks_storage.get(callback_given);
+					// callbacks_storage.delete(callback_given);
 				}
 				else {
+					if(TYPE_ONCE_EXACTLY === op && 1 === events.size && 1 === els.length){
+						// console.log('switching type');
+						op = TYPE_ONCE;
+					}
+
 					callback = function(ev){
 						// if(null === selector || matchesSelector(ev.target, selector) || ev.target.$parents(selector).length > 0){
 						// 	callback_given.call(this, ev);
@@ -776,15 +789,20 @@
 								);
 							}
 						}
-						if('one' === op){
-							op_bind('off', els, args);
+						if(TYPE_ONCE_EXACTLY === op){
+							op_bind(TYPE_OFF, els, args);
 						}
 					};
 
-					callbacks_storage.set(callback_given, callback);
+					if(TYPE_ONCE === op){
+						options.once = true;
+					}
+
+					// callbacks_storage.set(callback_given, callback);
+					callback_given[KEY_CALLBACK_ORIGINAL] = callback;
 				}
 
-				const listener_pref = ('off' === op ? 'remove' : 'add');
+				const listener_pref = (TYPE_OFF === op ? 'remove' : 'add');
 				op_do(els, listener_pref, events, callback, options);
 
 				return els;
@@ -797,13 +815,16 @@
 				}
 			};
 			pwin.on = function(...args){
-				return op_bind('on', this, args);
+				return op_bind(TYPE_ON, this, args);
 			};
-			pwin.one = function(...args){
-				return op_bind('one', this, args);
+			pwin.once = pwin.one = function(...args){
+				return op_bind(TYPE_ONCE, this, args);
+			};
+			pwin.onceExactly = function(...args){
+				return op_bind(TYPE_ONCE_EXACTLY, this, args);
 			};
 			pwin.off = function(...args){
-				return op_bind('off', this, args);
+				return op_bind(TYPE_OFF, this, args);
 			};
 
 			const has_event_constructor_support = (() => {
@@ -973,7 +994,14 @@
 				const el_related = isSelfOrParentEqual(ev.relatedTarget, els_set);
 				// console.log(el_target, el_related);
 				if(el_target && el_target !== el_related){
-					callback_given.call(this, ev);
+					callback_given.call(
+						this,
+						ev,
+						{
+							target: el_target,
+							relatedTarget: el_related
+						}
+					);
 				}
 			} : function(ev){
 				// console.log(ev.target, ev.relatedTarget);
@@ -981,7 +1009,14 @@
 				const el_related = isSelfOrParentMatch(ev.relatedTarget, selector);
 				// console.log(el_target, el_related);
 				if(el_target && el_target !== el_related){
-					callback_given.call(this, ev);
+					callback_given.call(
+						this,
+						ev,
+						{
+							target: el_target,
+							relatedTarget: el_related
+						}
+					);
 				}
 			};
 
