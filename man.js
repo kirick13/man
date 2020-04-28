@@ -999,7 +999,7 @@
 						ev,
 						{
 							target: el_target,
-							relatedTarget: el_related
+							relatedTarget: el_related,
 						}
 					);
 				}
@@ -1014,7 +1014,7 @@
 						ev,
 						{
 							target: el_target,
-							relatedTarget: el_related
+							relatedTarget: el_related,
 						}
 					);
 				}
