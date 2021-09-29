@@ -1,0 +1,27 @@
+{
+	"name": "@kirick/man",
+	"version": "1.0.2",
+	"description": "$man is jQuery-like library but with no shit.",
+	"main": "index.js",
+	"unpkg": "dist/man.esm-browser.min.js",
+	"jsdelivr": "dist/man.esm-browser.min.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kirick13/man.git"
+	},
+	"keywords": [
+		"man",
+		"jquery",
+		"manipulator",
+		"$man"
+	],
+	"author": "Daniil Kirichenko (https://twitter.com/kirickme)",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/kirick13/man/issues"
+	},
+	"homepage": "https://github.com/kirick13/man#readme"
+}
